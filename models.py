@@ -1,12 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///students.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-db = SQLAlchemy(app)
-
+from config import app, db
 
 class RaceEthnicity(db.Model):
     __tablename__ = "race_ethnicity"
@@ -43,6 +37,7 @@ class Student(db.Model):
     test_prep = db.relationship("TestPreparation", back_populates="students")
 
     scores = db.relationship("StudentScore", back_populates="student")
+    
 
 
 class Subject(db.Model):
@@ -62,6 +57,6 @@ class StudentScore(db.Model):
     student = db.relationship("Student", back_populates="scores")
     subject = db.relationship("Subject", back_populates="scores")
 
-# Создаем таблицы в базе данных
+
 with app.app_context():
     db.create_all()

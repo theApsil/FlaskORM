@@ -1,6 +1,6 @@
 from sqlalchemy import func, desc
-from config import db
 from models import Student, RaceEthnicity, ParentEducation, TestPreparation, Subject, StudentScore
+from config import db  
 
 def average_score_by_race():
     """
