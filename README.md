@@ -64,3 +64,7 @@
 #### **6. Таблица оценок (`student_scores`)**  
 | student_id (FK) | subject_id (FK) | score |  
 |-----------------|---------------|------|  
+
+
+### ER-диаграмма
+![alt text](data/ER.jpg)
