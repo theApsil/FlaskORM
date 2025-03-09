@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Студенты и их результаты</h1>
+    <h2>Список студентов</h2>
+    {% include "macros.html" %}
+    {{ render_table(students, ["id", "gender", "race_ethnicity.name", "parent_education.name", "lunch", "test_prep.name"]) }}
+
+    <h2>Средний балл по расовой принадлежности</h2>
+    {{ render_table(race_avg_scores, ["name", "avg_score"]) }}
+
+    <h2>Предмет с наивысшим средним баллом</h2>
+    <p>{{ top_subject.name }} - {{ top_subject.avg_score }}</p>
+
+    <h2>Средний балл по образованию родителей</h2>
+    {{ render_table(parent_education_scores, ["name", "avg_score"]) }}
+
+    <h2>Влияние подготовки к тестам</h2>
+    {{ render_table(prep_effectiveness, ["name", "avg_score"]) }}
+
+    <h2>Разница в успеваемости между полами</h2>
+    {{ render_table(gender_performance, ["gender", "avg_score"]) }}
+{% endblock %}
