@@ -26,7 +26,7 @@ class TypeBuilding(db.Model):
         self.name = name
 
     def __repr__(self):
-        return f"{self.id}. {self.name}"
+        return f"\n{self.id}. {self.name}"
 
 
 class City(db.Model):
