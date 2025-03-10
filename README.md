@@ -68,3 +68,7 @@
 
 ### ER-диаграмма
 ![alt text](data/ER.jpg)
+
+### Результаты вывода на страницу
+![alt text](data/res.png)
+![alt text](data/image.png)
