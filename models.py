@@ -1,5 +1,3 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from config import app, db
 
 class RaceEthnicity(db.Model):
@@ -38,7 +36,6 @@ class Student(db.Model):
 
     scores = db.relationship("StudentScore", back_populates="student")
     
-
 
 class Subject(db.Model):
     __tablename__ = "subjects"

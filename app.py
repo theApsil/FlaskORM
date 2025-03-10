@@ -10,6 +10,15 @@ from query import (
 )
 
 
+def get_attr(obj, attr):
+    try:
+        for part in attr.split("."):
+            obj = getattr(obj, part, "N/A") if obj else "N/A"
+        return obj
+    except AttributeError:
+        return "N/A"
+
+
 @app.route('/')
 def index():
     students = Student.query.all()
@@ -26,7 +35,8 @@ def index():
         top_subject=top_subject,
         parent_education_scores=parent_education_scores,
         prep_effectiveness=prep_effectiveness,
-        gender_performance=gender_performance
+        gender_performance=gender_performance,
+        get_attr=get_attr  # ✅ Передаем `getattr` в шаблон
     )
 
 

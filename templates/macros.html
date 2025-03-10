@@ -1,5 +1,5 @@
-{% macro render_table(data, columns) %}
-    <table>
+{% macro render_table(data, columns, get_attr) %}
+    <table border="1">
         <thead>
             <tr>
                 {% for col in columns %}
@@ -11,7 +11,7 @@
             {% for row in data %}
                 <tr>
                     {% for col in columns %}
-                        <td>{{ row[col] if col in row else getattr(row, col, 'N/A') }}</td>
+                        <td>{{ get_attr(row, col) }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
