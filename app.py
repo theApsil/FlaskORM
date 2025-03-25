@@ -36,7 +36,7 @@ def index():
         parent_education_scores=parent_education_scores,
         prep_effectiveness=prep_effectiveness,
         gender_performance=gender_performance,
-        get_attr=get_attr  # ✅ Передаем `getattr` в шаблон
+        get_attr=get_attr
     )
 
 

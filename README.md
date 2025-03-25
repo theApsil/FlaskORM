@@ -1,74 +1,49 @@
-### **Описание датасета**  
-Датасет **"Students Performance in Exams"** содержит данные об успеваемости студентов на экзаменах по трем предметам: математике, чтению и письму. Данные включают различную демографическую информацию, такую как пол, этническую принадлежность, уровень образования родителей, тип питания и прохождение подготовительного курса.  
+## [Описание датасета (ветка `dev-lab`)](https://github.com/theApsil/FlaskORM/blob/dev-lab/README.md)
 
-📌 **Ссылка на датасет:**  
-[Students Performance in Exams](https://www.kaggle.com/datasets/spscientist/students-performance-in-exams?resource=download)  
-
----
-
-### **Анализ структуры данных**  
-Датасет содержит следующие атрибуты:  
-
-1. **gender** – Пол студента (male, female).  
-2. **race/ethnicity** – Этническая группа (Group A, B, C, D, E).  
-3. **parental level of education** – Уровень образования родителей (high school, some college, bachelor's degree и др.).  
-4. **lunch** – Тип питания (standard, free/reduced).  
-5. **test preparation course** – Проходил ли студент курс подготовки к экзаменам (completed, none).  
-6. **math score** – Оценка по математике.  
-7. **reading score** – Оценка по чтению.  
-8. **writing score** – Оценка по письму.  
-
-📌 В данных присутствуют потенциальные связи:  
-- **Один-ко-многим (1:M)**:  
-  - Одна этническая группа включает нескольких студентов.  
-  - Один уровень образования родителей может встречаться у нескольких студентов.  
-  - Один курс подготовки может быть у нескольких студентов.  
-- **Многие-ко-многим (M:M)**:  
-  - Один студент имеет оценки по нескольким предметам (математика, чтение, письмо).  
-  - Один предмет может быть у разных студентов.  
-
----
-
-### **Нормализация данных**  
-Чтобы устранить избыточность и нормализовать структуру, выделим отдельные таблицы:  
-
-#### **1. Таблица студентов (`students`)**  
-| id (PK) | gender | race_ethnicity_id (FK) | parent_education_id (FK) | lunch | test_prep_id (FK) |  
-|---------|--------|--------------------|---------------------|-------|---------------|  
-
-#### **2. Таблица этнических групп (`race_ethnicity`)**  
-| id (PK) | name  |  
-|---------|------|  
-| 1       | Group A |  
-| 2       | Group B |  
-
-#### **3. Таблица образования родителей (`parent_education`)**  
-| id (PK) | name  |  
-|---------|------|  
-| 1       | High School |  
-| 2       | Bachelor's Degree |  
-
-#### **4. Таблица курсов подготовки (`test_prep`)**  
-| id (PK) | name  |  
-|---------|------|  
-| 1       | Completed |  
-| 2       | None |  
-
-#### **5. Таблица предметов (`subjects`)**  
-| id (PK) | name  |  
-|---------|------|  
-| 1       | Math |  
-| 2       | Reading |  
-| 3       | Writing |  
-
-#### **6. Таблица оценок (`student_scores`)**  
-| student_id (FK) | subject_id (FK) | score |  
-|-----------------|---------------|------|  
-
-
-### ER-диаграмма
-![alt text](data/ER.jpg)
-
-### Результаты вывода на страницу
-![alt text](data/res.png)
-![alt text](data/image.png)
+## JSON структура API (hypermedia)
+```json
+{
+  "students": [
+    {
+      "id": 1,
+      "gender": "male",
+      "race_ethnicity": "Group A",
+      "parent_education": "Bachelor's degree",
+      "lunch": "standard",
+      "test_prep": "completed",
+      "scores": [
+        { "subject": "Math", "score": 78 },
+        { "subject": "Reading", "score": 85 }
+      ],
+      "_links": {
+        "self": { "href": "/students/1" },
+        "scores": { "href": "/students/1/scores" }
+      }
+    }
+  ],
+  "_links": {
+    "self": { "href": "/students" },
+    "create": { "href": "/students", "method": "POST" }
+  }
+}
+```
+### `GET /students/{id}` (Описание студента по ID)
+```json
+{
+  "id": 10,
+  "gender": "female",
+  "race_ethnicity": "Group C",
+  "parent_education": "Master's degree",
+  "lunch": "free or reduced",
+  "test_prep": "none",
+  "scores": [
+    { "subject": "Math", "score": 90 },
+    { "subject": "Reading", "score": 88 }
+  ],
+  "_links": {
+    "self": { "href": "/students/10" },
+    "update": { "href": "/students/10", "method": "PUT" },
+    "delete": { "href": "/students/10", "method": "DELETE" }
+  }
+}
+```
