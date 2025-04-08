@@ -1,8 +1,160 @@
 from flask_restful import Resource
 from flask import request
-from models import db, Student
-from schemas import student_schema, students_schema
+from models import db, RaceEthnicity, ParentEducation, TestPreparation, Subject, StudentScore
+from schemas import (
+    RaceEthnicitySchema, ParentEducationSchema, TestPreparationSchema,
+    SubjectSchema, StudentScoreSchema, StudentSchema
+)
+from query import *
 
+race_schema = RaceEthnicitySchema()
+races_schema = RaceEthnicitySchema(many=True)
+
+parent_schema = ParentEducationSchema()
+parents_schema = ParentEducationSchema(many=True)
+
+prep_schema = TestPreparationSchema()
+preps_schema = TestPreparationSchema(many=True)
+
+subject_schema = SubjectSchema()
+subjects_schema = SubjectSchema(many=True)
+
+score_schema = StudentScoreSchema()
+scores_schema = StudentScoreSchema(many=True)
+
+student_schema = StudentSchema()
+students_schema = StudentSchema(many=True)
+
+# Race
+class RaceListResource(Resource):
+    def post(self):
+        data = request.get_json()
+        race = RaceEthnicity(name=data["name"])
+        db.session.add(race)
+        db.session.commit()
+        return race_schema.dump(race), 201
+
+    def get(self):
+        return races_schema.dump(RaceEthnicity.query.all()), 200
+
+class RaceResource(Resource):
+    def get(self, id):
+        race = RaceEthnicity.query.get_or_404(id)
+        return race_schema.dump(race), 200
+
+
+# Parent Education
+class ParentEducationListResource(Resource):
+    def post(self):
+        data = request.get_json()
+        edu = ParentEducation(name=data["name"])
+        db.session.add(edu)
+        db.session.commit()
+        return parent_schema.dump(edu), 201
+
+    def get(self):
+        return parents_schema.dump(ParentEducation.query.all()), 200
+
+class ParentEducationResource(Resource):
+    def get(self, id):
+        edu = ParentEducation.query.get_or_404(id)
+        return parent_schema.dump(edu), 200
+
+
+# Test Preparation
+class TestPrepListResource(Resource):
+    def post(self):
+        data = request.get_json()
+        prep = TestPreparation(name=data["name"])
+        db.session.add(prep)
+        db.session.commit()
+        return prep_schema.dump(prep), 201
+
+    def get(self):
+        return preps_schema.dump(TestPreparation.query.all()), 200
+
+class TestPrepResource(Resource):
+    def get(self, id):
+        prep = TestPreparation.query.get_or_404(id)
+        return prep_schema.dump(prep), 200
+
+
+# Subject
+class SubjectListResource(Resource):
+    def post(self):
+        data = request.get_json()
+        subject = Subject(name=data["name"])
+        db.session.add(subject)
+        db.session.commit()
+        return subject_schema.dump(subject), 201
+
+    def get(self):
+        return subjects_schema.dump(Subject.query.all()), 200
+
+class SubjectResource(Resource):
+    def get(self, id):
+        subject = Subject.query.get_or_404(id)
+        return subject_schema.dump(subject), 200
+    
+    def put(self, id):
+        subject = db.session.get(Subject, id)
+        if not subject:
+            return {"error": "Score not found"}, 404
+
+        data = request.get_json()
+        subject.name = data.get("name", subject.name)
+        db.session.commit()
+        return subject_schema.dump(subject), 200
+    
+
+    def delete(self, id):
+        subject = Subject.query.get_or_404(id)
+        db.session.delete(subject)
+        db.session.commit()
+        return {}, 204
+
+
+# Student Scores
+class StudentScoreListResource(Resource):
+    def post(self):
+        data = request.get_json()
+        score = StudentScore(
+            student_id=data["student_id"],
+            subject_id=data["subject_id"],
+            score=data["score"]
+        )
+        db.session.add(score)
+        db.session.commit()
+        return score_schema.dump(score), 201
+
+    def get(self):
+        return scores_schema.dump(StudentScore.query.all()), 200
+
+class StudentScoreResource(Resource):
+    def get(self, student_id, subject_id):
+        score = db.session.get(StudentScore, (student_id, subject_id))
+        if not score:
+            return {"error": "Score not found"}, 404
+        return score_schema.dump(score), 200
+
+    def put(self, student_id, subject_id):
+        score = db.session.get(StudentScore, (student_id, subject_id))
+        if not score:
+            return {"error": "Score not found"}, 404
+
+        data = request.get_json()
+        score.score = data.get("score", score.score)
+        db.session.commit()
+        return score_schema.dump(score), 200
+
+    def delete(self, student_id, subject_id):
+        score = db.session.get(StudentScore, (student_id, subject_id))
+        if not score:
+            return {"error": "Score not found"}, 404
+
+        db.session.delete(score)
+        db.session.commit()
+        return {}, 204
 
 class StudentResource(Resource):
     def get(self, student_id):
@@ -26,7 +178,7 @@ class StudentResource(Resource):
         student = Student.query.get_or_404(student_id)
         db.session.delete(student)
         db.session.commit()
-        return 204
+        return {}, 204
 
 
 class StudentListResource(Resource):
@@ -47,3 +199,18 @@ class StudentListResource(Resource):
         db.session.add(new_student)
         db.session.commit()
         return student_schema.dump(new_student), 201
+    
+
+class AnalyticsResource(Resource):
+    def get(self, type):
+        if type == "average-score-by-race":
+            return average_score_by_race()
+        elif type == "highest-scoring-subject":
+            return highest_scoring_subject()
+        elif type == "score-by-parent-education":
+            return score_distribution_by_parent_education()
+        elif type == "test-prep-effectiveness":
+            return test_prep_effectiveness()
+        elif type == "gender-performance":
+            return gender_performance_difference()
+        return {"error": "Unknown analytics type"}, 400

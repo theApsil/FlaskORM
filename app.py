@@ -9,7 +9,15 @@ from query import (
     test_prep_effectiveness,
     gender_performance_difference,
 )
-from resources import StudentResource, StudentListResource
+from resources import (
+    RaceListResource, RaceResource,
+    ParentEducationListResource, ParentEducationResource,
+    TestPrepListResource, TestPrepResource,
+    SubjectListResource, SubjectResource,
+    StudentScoreListResource, StudentScoreResource,
+    StudentListResource, StudentResource, 
+    AnalyticsResource
+)
 from schemas import ma
 
 api = Api(app)
@@ -18,6 +26,22 @@ ma.init_app(app)
 api.add_resource(StudentListResource, "/api/students")
 api.add_resource(StudentResource, "/api/students/<int:student_id>")
 
+api.add_resource(RaceListResource, "/api/races")
+api.add_resource(RaceResource, "/api/races/<int:id>")
+
+api.add_resource(ParentEducationListResource, "/api/parent-education")
+api.add_resource(ParentEducationResource, "/api/parent-education/<int:id>")
+
+api.add_resource(TestPrepListResource, "/api/test-prep")
+api.add_resource(TestPrepResource, "/api/test-prep/<int:id>")
+
+api.add_resource(SubjectListResource, "/api/subjects")
+api.add_resource(SubjectResource, "/api/subjects/<int:id>")
+
+api.add_resource(StudentScoreListResource, "/api/scores")
+api.add_resource(StudentScoreResource, "/api/scores/<int:student_id>/<int:subject_id>")
+
+api.add_resource(AnalyticsResource, "/api/analytics/<string:type>")
 
 def get_attr(obj, attr):
     try:

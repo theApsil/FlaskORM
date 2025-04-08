@@ -8,30 +8,38 @@ class RaceEthnicitySchema(ma.SQLAlchemyAutoSchema):
         model = RaceEthnicity
         include_relationships = True
         load_instance = True
+        exclude = ["students"]
 
 class ParentEducationSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = ParentEducation
         include_relationships = True
         load_instance = True
+        exclude = ["students"]
 
 class TestPreparationSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = TestPreparation
         include_relationships = True
         load_instance = True
+        exclude = ["students"]
 
 class SubjectSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Subject
         include_relationships = True
         load_instance = True
+        exclude = ["scores"]
 
 class StudentScoreSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = StudentScore
         include_relationships = True
         load_instance = True
+        
+    student_id = ma.auto_field()
+    subject_id = ma.auto_field()
+    score = ma.auto_field()
 
 class StudentSchema(ma.SQLAlchemyAutoSchema):
     scores = ma.Nested(StudentScoreSchema, many=True)

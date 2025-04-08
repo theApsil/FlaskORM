@@ -1,12 +1,12 @@
 from sqlalchemy import func, desc
 from models import Student, RaceEthnicity, ParentEducation, TestPreparation, Subject, StudentScore
-from config import db  
+from config import db
+
+def to_dict_list(query_result, keys):
+    return [dict(zip(keys, row)) for row in query_result]
 
 def average_score_by_race():
-    """
-    Вычисляет средний балл студентов по расовой/этнической принадлежности.
-    """
-    return (
+    result = (
         db.session.query(
             RaceEthnicity.name,
             func.avg(StudentScore.score).label("avg_score")
@@ -17,12 +17,10 @@ def average_score_by_race():
         .order_by(desc("avg_score"))
         .all()
     )
+    return to_dict_list(result, ["race", "avg_score"])
 
 def highest_scoring_subject():
-    """
-    Определяет предмет с наивысшим средним баллом среди всех студентов.
-    """
-    return (
+    result = (
         db.session.query(
             Subject.name,
             func.avg(StudentScore.score).label("avg_score")
@@ -32,12 +30,12 @@ def highest_scoring_subject():
         .order_by(desc("avg_score"))
         .first()
     )
+    if result:
+        return {"subject": result[0], "avg_score": result[1]}
+    return {}
 
 def score_distribution_by_parent_education():
-    """
-    Группирует студентов по уровню образования родителей и вычисляет средний балл.
-    """
-    return (
+    result = (
         db.session.query(
             ParentEducation.name,
             func.avg(StudentScore.score).label("avg_score")
@@ -48,12 +46,10 @@ def score_distribution_by_parent_education():
         .order_by(desc("avg_score"))
         .all()
     )
+    return to_dict_list(result, ["education_level", "avg_score"])
 
 def test_prep_effectiveness():
-    """
-    Анализирует влияние подготовки к тестам на средний балл студентов.
-    """
-    return (
+    result = (
         db.session.query(
             TestPreparation.name,
             func.avg(StudentScore.score).label("avg_score")
@@ -64,12 +60,10 @@ def test_prep_effectiveness():
         .order_by(desc("avg_score"))
         .all()
     )
+    return to_dict_list(result, ["prep_course", "avg_score"])
 
 def gender_performance_difference():
-    """
-    Сравнивает средний балл между мужчинами и женщинами.
-    """
-    return (
+    result = (
         db.session.query(
             Student.gender,
             func.avg(StudentScore.score).label("avg_score")
@@ -79,3 +73,4 @@ def gender_performance_difference():
         .order_by(desc("avg_score"))
         .all()
     )
+    return to_dict_list(result, ["gender", "avg_score"])
