@@ -3,7 +3,7 @@ from flask import request
 from models import db, RaceEthnicity, ParentEducation, TestPreparation, Subject, StudentScore
 from schemas import (
     RaceEthnicitySchema, ParentEducationSchema, TestPreparationSchema,
-    SubjectSchema, StudentScoreSchema, StudentSchema
+    SubjectSchema, StudentScoreSchema, StudentSchema, StudentScoreHyperSchema
 )
 from query import *
 
@@ -25,6 +25,8 @@ scores_schema = StudentScoreSchema(many=True)
 student_schema = StudentSchema()
 students_schema = StudentSchema(many=True)
 
+student_score_schema = StudentScoreHyperSchema()
+student_scores_schema = StudentScoreHyperSchema(many=True)
 # Race
 class RaceListResource(Resource):
     def post(self):
@@ -116,6 +118,16 @@ class SubjectResource(Resource):
 
 # Student Scores
 class StudentScoreListResource(Resource):
+    def get(self):
+        scores = StudentScore.query.all()
+        return {
+            "scores": student_scores_schema.dump(scores),
+            "_links": {
+                "self": {"href": "/scores"},
+                "create": {"href": "/scores", "method": "POST"}
+            }
+        }, 200
+
     def post(self):
         data = request.get_json()
         score = StudentScore(
@@ -125,33 +137,23 @@ class StudentScoreListResource(Resource):
         )
         db.session.add(score)
         db.session.commit()
-        return score_schema.dump(score), 201
+        return student_score_schema.dump(score), 201
 
-    def get(self):
-        return scores_schema.dump(StudentScore.query.all()), 200
 
 class StudentScoreResource(Resource):
     def get(self, student_id, subject_id):
-        score = db.session.get(StudentScore, (student_id, subject_id))
-        if not score:
-            return {"error": "Score not found"}, 404
-        return score_schema.dump(score), 200
+        score = StudentScore.query.get_or_404((student_id, subject_id))
+        return student_score_schema.dump(score), 200
 
     def put(self, student_id, subject_id):
-        score = db.session.get(StudentScore, (student_id, subject_id))
-        if not score:
-            return {"error": "Score not found"}, 404
-
+        score = StudentScore.query.get_or_404((student_id, subject_id))
         data = request.get_json()
         score.score = data.get("score", score.score)
         db.session.commit()
-        return score_schema.dump(score), 200
+        return student_score_schema.dump(score), 200
 
     def delete(self, student_id, subject_id):
-        score = db.session.get(StudentScore, (student_id, subject_id))
-        if not score:
-            return {"error": "Score not found"}, 404
-
+        score = StudentScore.query.get_or_404((student_id, subject_id))
         db.session.delete(score)
         db.session.commit()
         return {}, 204

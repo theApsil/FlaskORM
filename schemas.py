@@ -26,6 +26,9 @@ class TestPreparationSchema(ma.SQLAlchemyAutoSchema):
         exclude = ["students"]
 
 class SubjectSchema(ma.SQLAlchemyAutoSchema):
+    id = fields.Int()
+    name = fields.Str()
+
     class Meta:
         model = Subject
         include_relationships = True
@@ -41,6 +44,7 @@ class StudentScoreSchema(ma.SQLAlchemyAutoSchema):
     student_id = ma.auto_field()
     subject_id = ma.auto_field()
     score = ma.auto_field()
+
 
 class ScoreNestedSchema(Schema):
     subject = fields.String(attribute="subject.name")
@@ -84,6 +88,22 @@ class StudentSchema(Schema):
                 }
             }
         return data
+
+
+class StudentScoreHyperSchema(Schema):
+    student_id = fields.Int()
+    subject_id = fields.Int()
+    score = fields.Float()
+    student = fields.Nested(StudentSchema)
+    subject = fields.Nested(SubjectSchema)
+    _links = fields.Method("get_links")
+
+    def get_links(self, obj):
+        return {
+            "self": {"href": f"/scores/{obj.student_id}/{obj.subject_id}"},
+            "update": {"href": f"/scores/{obj.student_id}/{obj.subject_id}", "method": "PUT"},
+            "delete": {"href": f"/scores/{obj.student_id}/{obj.subject_id}", "method": "DELETE"}
+        }
 
 student_schema = StudentSchema()
 students_schema = StudentSchema(many=True)
