@@ -2,6 +2,7 @@ from flask import render_template
 from flask_restful import Api
 from config import app, db
 from models import Student
+from flask_cors import CORS
 from query import (
     average_score_by_race,
     highest_scoring_subject,
@@ -20,9 +21,13 @@ from resources import (
 )
 from schemas import ma
 
+# Enable CORS for all routes
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 api = Api(app)
 ma.init_app(app)
 
+# API Routes
 api.add_resource(StudentListResource, "/api/students")
 api.add_resource(StudentResource, "/api/students/<int:student_id>")
 
@@ -41,7 +46,29 @@ api.add_resource(SubjectResource, "/api/subjects/<int:id>")
 api.add_resource(StudentScoreListResource, "/api/scores")
 api.add_resource(StudentScoreResource, "/api/scores/<int:student_id>/<int:subject_id>")
 
+# Analytics Routes
 api.add_resource(AnalyticsResource, "/api/analytics/<string:type>")
+
+# Analytics API endpoints
+@app.route('/api/analytics/average-score-by-race')
+def get_average_score_by_race():
+    return average_score_by_race()
+
+@app.route('/api/analytics/highest-scoring-subject')
+def get_highest_scoring_subject():
+    return highest_scoring_subject()
+
+@app.route('/api/analytics/score-by-parent-education')
+def get_score_by_parent_education():
+    return score_distribution_by_parent_education()
+
+@app.route('/api/analytics/test-prep-effectiveness')
+def get_test_prep_effectiveness():
+    return test_prep_effectiveness()
+
+@app.route('/api/analytics/gender-performance')
+def get_gender_performance():
+    return gender_performance_difference()
 
 def get_attr(obj, attr):
     try:

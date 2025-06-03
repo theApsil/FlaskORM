@@ -29,11 +29,19 @@ class SubjectSchema(ma.SQLAlchemyAutoSchema):
     id = fields.Int()
     name = fields.Str()
 
+    def get_links(self, obj):
+        return {
+            "self": {"href": f"/subjects/{obj.id}"},
+            "update": {"href": f"/subjects/{obj.id}", "method": "PUT"},
+            "delete": {"href": f"/subjects/{obj.id}", "method": "DELETE"},
+        }
+
     class Meta:
         model = Subject
         include_relationships = True
         load_instance = True
         exclude = ["scores"]
+
 
 class StudentScoreSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -100,10 +108,23 @@ class StudentScoreHyperSchema(Schema):
 
     def get_links(self, obj):
         return {
-            "self": {"href": f"/scores/{obj.student_id}/{obj.subject_id}"},
-            "update": {"href": f"/scores/{obj.student_id}/{obj.subject_id}", "method": "PUT"},
-            "delete": {"href": f"/scores/{obj.student_id}/{obj.subject_id}", "method": "DELETE"}
+            "self": {
+                "href": f"/scores/{obj.student_id}/{obj.subject_id}"
+            },
+            "update": {
+                "href": f"/scores/{obj.student_id}/{obj.subject_id}",
+                "method": "PUT"
+            },
+            "delete": {
+                "href": f"/scores/{obj.student_id}/{obj.subject_id}",
+                "method": "DELETE"
+            }
         }
+    
+    class Meta:
+        model = StudentScore
+        include_relationships = True
+        load_instance = True
 
 student_schema = StudentSchema()
 students_schema = StudentSchema(many=True)
