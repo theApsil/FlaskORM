@@ -206,7 +206,7 @@ class StudentListResource(Resource):
 class AnalyticsResource(Resource):
     def get(self, type):
         if type == "average-score-by-race":
-            return average_score_by_race()
+            return analytics_score_by_race()
         elif type == "highest-scoring-subject":
             return highest_scoring_subject()
         elif type == "score-by-parent-education":

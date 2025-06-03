@@ -4,11 +4,12 @@ from config import app, db
 from models import Student
 from flask_cors import CORS
 from query import (
-    average_score_by_race,
+    analytics_score_by_race,
     highest_scoring_subject,
     score_distribution_by_parent_education,
     test_prep_effectiveness,
-    gender_performance_difference,
+    gender_performance_difference, analytics_score_by_parent, analytics_score_by_test_prep, analytics_score_by_lunch,
+    analytics_score_by_gender,
 )
 from resources import (
     RaceListResource, RaceResource,
@@ -50,9 +51,25 @@ api.add_resource(StudentScoreResource, "/api/scores/<int:student_id>/<int:subjec
 api.add_resource(AnalyticsResource, "/api/analytics/<string:type>")
 
 # Analytics API endpoints
-@app.route('/api/analytics/average-score-by-race')
+@app.route('/api/analytics/analytics-score-by-race')
 def get_average_score_by_race():
-    return average_score_by_race()
+    return analytics_score_by_race()
+
+@app.route('/api/analytics/analytics-score-by-parent')
+def get_average_score_by_parent():
+    return analytics_score_by_parent()
+
+@app.route('/api/analytics/analytics-score-by-test-prep')
+def get_average_score_by_test_prep():
+    return analytics_score_by_test_prep()
+
+@app.route('/api/analytics/analytics-score-by-gender')
+def get_average_score_by_gender():
+    return analytics_score_by_gender()
+
+@app.route('/api/analytics/analytics-score-by-lunch')
+def get_average_score_by_lunch():
+    return analytics_score_by_lunch()
 
 @app.route('/api/analytics/highest-scoring-subject')
 def get_highest_scoring_subject():
@@ -82,7 +99,7 @@ def get_attr(obj, attr):
 @app.route('/')
 def index():
     students = Student.query.all()
-    race_avg_scores = average_score_by_race()
+    race_avg_scores = analytics_score_by_race()
     top_subject = highest_scoring_subject()
     parent_education_scores = score_distribution_by_parent_education()
     prep_effectiveness = test_prep_effectiveness()
